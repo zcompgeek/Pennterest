@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'>
+    </script>
+    <script>
+
+    function goHome(id){
+      window.location.href = '/home';
+    }
+    function goProfile(id){
+	  window.location.href = '/user?userID=' + id;
+	}
+	function newPin(numBoards){
+		if(numBoards == 0){
+			document.getElementById("noBoardMessage").style.visibility='visible';
+		}
+		else{
+			document.getElementById("newPinPopup").style.visibility='visible';
+		}
+	}
+
+	function closeWindow(){
+		document.getElementById("newPinPopup").style.visibility='hidden';
+		document.getElementById("noBoardMessage").style.visibility='hidden';
+	}
+    </script>
+
+</head>
+
+<body>
+<div id="toolbar">
+Pennterest
+<span><form id="search" action="/search" method="get">
+    <input id="textInput" type="text" size="21" maxlength="120" name="searchterm">
+    <input id="searchButton" type="submit" value="search" class="tfbutton">
+</form></span>
+<span id="logout"><a href="/logout">Logout</a></span>
+<span id="home"><a href="/home">Home</a></span>
+<span id="profile"><a href="/user?userID=<%=viewer%>">Profile</a></span>
+<span id="settings"><a href="/settings">Settings</a></span>
+<span id="newPin"><button type="button" class="addButton" onclick="newPin(<%=boards.length%>)">+</button></span>
+</div>
+
+<table id="userinfo">
+<tr style="height:100%">
+<% var pic = user[0].PROFILEPICPATH; 
+if (pic == null || pic == 'undefined') {
+	pic = "http://3.bp.blogspot.com/_JBHfzEovWs8/S8X3wH9vbTI/AAAAAAAAAPM/O8r2xpeeur0/s200/batman-for-facebook.jpg";
+}%>  
+<td style="width:25%; height:100%; overflow:hidden">
+<img src="<%=pic%>"/>
+</td>
+<td id="userbasics">
+<% var lastname = user[0].LASTNAME;
+if(lastname == null || lastname == 'undefined') {
+lastname = "";
+} %>
+<%=user[0].FIRSTNAME%> <%=lastname%> <br/>
+<p style="font-size:22px">
+<% if (user[0].GENDER != null && user[0].GENDER != 'undefined'){ %>
+Gender: <%=user[0].GENDER%> <br/> 
+<% } %>
+<% if (user[0].DOB != null && user[0].DOB != 'undefined'){ %>
+Birthday: <%=user[0].DOB%>  <br/>
+<% } %>
+<% if (user[0].AFFILIATION != null && user[0].AFFILIATION != 'undefined'){ %>
+Affiliation: <%=user[0].AFFILIATION%> <br/> 
+<% } %>
+<br/>
+<% if (user[0].BIO != null && user[0].BIO != 'undefined') { %>
+About Me:<br/>
+<%=user[0].BIO%>
+<% } %>
+</p> 
+</td>
+<% if(viewer != user[0].USERID) { %>
+<td id="follow">
+<form action="/follow" method="POST" target="hidden-iframe">
+<input type="text" name="followed" value="<%=user[0].USERID%>" style="display:none">
+<input id="followButton" type="submit" value="FOLLOW">
+</form>
+</td>
+<% } %>
+</tr>
+</table>
+
+<div id="boards">
+<center><h4>My Boards</h4></center>
+<table style="margin-left:auto; margin-right:auto;">
+<tr>
+<% var i = 0;
+	for(i = 0; i < boards.length; i++) {
+    var bname = boards[i].BOARDNAME;
+    var bpic = boards[i].CONTENTPATH;
+    var buser = user[0].USERID
+    if(bpic == null || bpic == 'undefined'){
+    	bpic = "/Shibe_Inu_Doge_meme.jpg";
+    }
+    if(i % 2 == 0) { %> <tr/><tr> <% } %>
+    <td>
+    <a href="/board?boardName=<%=bname%>&buserID=<%=buser%>">
+    <div class = 'upinDisplay'>
+    	<img src="<%=bpic%>"><br/>
+   	 	<center><p style="font-size:26px"><%=bname%></p></center>
+    </div>
+    </a>
+    </td>
+<% } 
+ if( viewer == user[0].USERID ) {
+ if(i % 2 == 0 && i != 0) { %> </tr><tr> <% } %>
+ <td>
+ 	<div class='upinDisplay' style="background-color:rgba(200, 200, 200, 0.4);font-size:26px">
+ 	<center><p style="padding-top:20px;">Add a board</p><center/>
+	<form id="addBoard" action="/addBoard" method="post">
+    <input id="boardName" type="text" size="50" maxlength="120" name="boardName" 
+    	value="Board Name" style="height:50px;border-radius:5px">
+    <input id="newBoardButton" type="submit" value="Go" class="tfbutton">
+    </div>
+</form>
+ </td>
+ <% } %>
+</tr>
+</table>
+</div>
+<div id="friends">
+<h4>Following</h4>
+<% for(var i = 0; i < friends.length; i++) {
+    var fname = friends[i].FIRSTNAME;
+    var flast = friends[i].LASTNAME;
+    var fuser = friends[i].USERID
+    var fpic = friends[i].PROFILEPICPATH
+    if(fpic == null || fpic == 'undefined') {
+    	fpic = "http://3.bp.blogspot.com/_JBHfzEovWs8/S8X3wH9vbTI/AAAAAAAAAPM/O8r2xpeeur0/s200/batman-for-facebook.jpg";
+    }
+     %>
+    <a href="/user?userID=<%=fuser%>"><img src="<%=fpic%>"> <%=fname%> <%=flast%></a><br />
+<% } %>
+<br />
+</div>
+
+<div class="popUp" id="newPinPopup" style="visibility:hidden">
+<form id="newPinForm" action="/pinNewContent" method="POST" target="hidden-iframe">
+Choose Board <br/>
+<select name="boardName" form="newPinForm">
+<% for(var i = 0; i < boards.length; i++) {
+ 	var bname = boards[i].BOARDNAME; %>
+	<option value="<%=bname%>"><%=bname%></option>
+<% } %>
+</select><br/>
+URL <br/>
+<input style="width:80%;" type="text" name="url"><br/>
+Description <br/>
+<input class="descInput" type="text" name="description"><br/>
+<span></span>
+<button class="pinCancel" type="button" onclick="closeWindow()">Cancel</button>
+<input class="pinSubmit" type="submit" value="Pin" onclick="closeWindow()">
+</form>
+</div>
+<iframe id="hidden-iframe" style="display:none"></iframe>
+
+</body>
+</html>

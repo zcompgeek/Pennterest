@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'>
+	</script>
+    
+    <script>
+    function showPinButton(button, rate, img){
+    	document.getElementById(button).style.visibility='visible';
+    	document.getElementById(rate).style.visibility='visible';
+    	img.style.opacity='0.8';
+	}
+	
+	function hidePinButton(button, rate, img){
+		document.getElementById(button).style.visibility='hidden';
+		document.getElementById(rate).style.visibility='hidden';
+		img.style.opacity='1.0';
+	}
+	
+	function showRating(rate, img){
+		document.getElementById(rate).style.visibility='visible';
+    	img.style.opacity='0.8';
+	}
+	
+	function hideRating(rate, img){
+		document.getElementById(rate).style.visibility='hidden';
+		img.style.opacity='1.0';
+	}
+	
+	function submitRating(formID){
+		console.log("submitting rating");
+		$(formID).submit();
+	}
+	
+	function pin(pinID, numBoards){
+		if(numBoards == 0){
+			document.getElementById("noBoardMessage").style.visibility='visible';
+		}
+		else{
+			document.getElementById("toBePinned").value =pinID;
+			document.getElementById("pinPopup").style.visibility='visible';
+		}
+	}
+	
+	function newPin(numBoards){
+		console.log(numBoards);
+		if(numBoards == 0){
+			document.getElementById("noBoardMessage").style.visibility='visible';
+		}
+		else{
+			document.getElementById("newPinPopup").style.visibility='visible';
+		}
+	}
+	
+	function closeWindow(){
+		document.getElementById("pinPopup").style.visibility='hidden';
+		//closing both because I was too lazy to make a method specific to the "newpin" version
+		document.getElementById("newPinPopup").style.visibility='hidden';
+		document.getElementById("noBoardMessage").style.visibility='hidden';
+	}
+	
+	function goHome(id){
+	  window.location.href = '/home';
+	  
+	}
+	
+	 function goProfile(id){
+       window.location.href = '/user?userID=' + id;      
+     }
+    </script>
+</head>
+
+<body>
+<div id="toolbar">
+Pennterest
+<span><form id="search" action="/search" method="get">
+	<input id="textInput" type="text" size="21" maxlength="120" name="searchterm">
+	<input id="searchButton" type="submit" value="search" class="tfbutton">
+</form></span>
+<span id="logout"><a href="/logout">Logout</a></span>
+<span id="home"><a href="/home">Home</a></span>
+<span id="profile"><a href="/user">Profile</a></span>
+<span id="settings"><a href="/settings">Settings</a></span>
+<span style="font-size:26px"><button type="button" class="addButton" onclick="newPin(<%=boards.length%>)">+</button></span>
+</div>
+<% if(upins.length == 0) { %> You Have No Recent Pins to Display 
+<%} else {%>
+<center>Your Recent Pins</center>
+<% } %>
+<table id="upins">
+<tr>
+<% for(var i = 0; i < upins.length; i++) { %>
+<% if(i % 4 == 0 && i != 0) { %> </tr><tr> <% } %>
+<td>
+<div class="upinDisplay">
+      <div onmouseover="showRating('<%="urate" + i%>', this)" 
+      onmouseout="hideRating('<%="urate" + i%>', this)">
+      <% if (upins[i].CACHED == '1') {
+      	var file_name = (upins[i].CONTENTPATH).split('/').pop();
+		var ext = file_name.split('.').pop();
+      %>
+      <img id="<%="img" + i%>" src ="/cache/<%= upins[i].CONTENTID %>.<%=ext%>"></br>
+      <% } else {%>
+      <img id="<%="img" + i%>" src ="<%= upins[i].CONTENTPATH %>"></br>
+      <% } %>
+      
+      <div class='rate' id="<%="urate" + i%>">
+      <span style="line-height:40px; vertical-align:center">Rate</span>
+      <%var formID = "uratingForm" + i%>
+      <form id=<%=formID%> class="ratingButtons" action="/updateRating" method="POST" target="hidden-iframe">
+	  <input type="radio" name="rating" value="1" onclick="submitRating(<%formID%>)">
+	  <input type="radio" name="rating" value="2" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="3" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="4" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="5" onclick="submitRating(<%=formID%>)">
+	  <input type="text" name="userID" value="<%=userID %>" style="display:none">
+	  <input type="text" name="pinID" value="<%=upins[i].PINID %>" style="display:none">
+	  </form>
+      </div>
+      <div class ='udescription'> 
+      <div class='stars'>
+      <% var rating = upins[i].RATING;
+         if(rating > 5) { rating = 5; } 
+      	for (var j = 0; j < rating; j++) { %>
+      		<span class="star"></span>
+      <% } %> 
+      </div>
+      <% if (upins[i].CAPTION != null) { %>
+      <%= upins[i].CAPTION %>
+      <% } else {%>
+      <% if(upins[i].TAGS != null || upins[i].TAGS != undefined) { %>
+      	#<%= upins[i].TAGS %>
+      <% } %>
+      <% } %>
+</td>
+<% } %>
+</tr>
+</table><br/><br/>
+<center>Suggestions<br/><br/></center>
+<table id="feed">
+<tr>
+<% for(var i = 0; i < pins.length; i++) { %>
+      <% if(i % 4 == 0 && i != 0) { %> </tr><tr> <% } %>
+      <td>
+      <div class="pinDisplay">
+      <div onmouseover="showPinButton('<%="button" + i%>', '<%="rate" + i%>', this)" 
+      onmouseout="hidePinButton('<%="button" + i%>','<%="rate" + i%>', this)">
+      <% if (pins[i].CACHED == '1') {
+      	var file_name = (pins[i].CONTENTPATH).split('/').pop();
+		var ext = file_name.split('.').pop();
+      %>
+      <img id="<%="img" + i%>" src ="/cache/<%= pins[i].CONTENTID %>.<%=ext%>"></br>
+      <% } else {%>
+      <img id="<%="img" + i%>" src ="<%= pins[i].CONTENTPATH %>"></br>
+      <% } %>
+      <div class='rate' id="<%="rate" + i%>">
+      <span style="line-height:40px; vertical-align:center">Rate</span>
+      <%var formID = "ratingForm" + i%>
+      <form id=<%=formID%> class="ratingButtons" action="/updateRating" method="POST" target="hidden-iframe">
+	  <input type="radio" name="rating" value="1" onclick="submitRating(<%formID%>)">
+	  <input type="radio" name="rating" value="2" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="3" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="4" onclick="submitRating(<%=formID%>)">
+	  <input type="radio" name="rating" value="5" onclick="submitRating(<%=formID%>)">
+	  <input type="text" name="userID" value="<%=userID %>" style="display:none">
+	  <input type="text" name="pinID" value="<%=pins[i].PINID %>" style="display:none">
+	  </form>
+      </div>
+      <button class='pinButton' id="<%="button" + i%>" type="button" onclick="pin(<%=pins[i].PINID%>, <%=boards.length%>)")">Pin It</button>
+      <div class ='description'> 
+      <div class='stars'>
+      <% var rating = pins[i].RATING;
+         if(rating > 5) { rating = 5; } 
+      	for (var j = 0; j < rating; j++) { %>
+      		<span id='<%="star" + j + i %>' class="star"></span>
+      <% } %> 
+      </div>
+      <% if (pins[i].CAPTION != null) { %>
+      <%= pins[i].CAPTION %>
+      <% } else {%>
+      <% if(pins[i].TAGS != null || pins[i].TAGS != undefined) { %>
+      	#<%= pins[i].TAGS %>
+      <% } %>
+      <% } %>
+      </div>
+      <a href="/user?userID=<%=pins[i].USERID%>">
+      	<span class="userName"><%= pins[i].FIRSTNAME %></span>
+      </a>
+      <a href="/board?boardName=<%=pins[i].BOARDNAME %>&buserID=<%=pins[i].USERID%>">
+      	<span class="boardName"><%= pins[i].BOARDNAME %></span>
+      </a>
+      </div>
+      </td>
+    <% } %>
+</tr>
+</table>
+
+<div class="popUp" id="noBoardMessage" style="visibility:hidden">
+You have not created any boards yet. Go to your profile to make a board,
+then start pinning!<br/><br/><br/>
+<button class="pinSubmit" type="button" onclick="closeWindow()">OK</button>
+</div>
+
+<div class="popUp" id="pinPopup" style="visibility:hidden">
+<form id="pinForm" action="/pinExisting" method="POST" target="hidden-iframe">
+Choose Board <br/>
+<select name="boardName" form="pinForm">
+<% for(var i = 0; i < boards.length; i++) {
+ 	var bname = boards[i].BOARDNAME; %>
+	<option value="<%=bname%>"><%=bname%></option>
+<% } %>
+</select><br/>
+Description <br/>
+<input class="descInput" type="text" name="description"><br/>
+<input id="toBePinned" type="text" name="pinID" style="display:none">
+<input type="text" name="userID" value="<%=userID%>" style="display:none">
+<br/>
+<br/>
+<button class="pinCancel" type="button" onclick="closeWindow()">Cancel</button>
+<input class="pinSubmit" type="submit" value="Pin" onclick="closeWindow()">
+</form>
+</div>
+
+<div class="popUp" id="newPinPopup" style="visibility:hidden">
+<form id="newPinForm" action="/pinNewContent" method="POST" target="hidden-iframe">
+Choose Board <br/>
+<select name="boardName" form="newPinForm">
+<% for(var i = 0; i < boards.length; i++) {
+ 	var bname = boards[i].BOARDNAME; %>
+	<option value="<%=bname%>"><%=bname%></option>
+<% } %>
+</select><br/>
+URL <br/>
+<input style="width:80%;" type="text" name="url"><br/>
+Description <br/>
+<input class="descInput" type="text" name="description"><br/>
+<input type="text" name="userID" value="<%=userID%>" style="display:none">
+<span></span>
+<button class="pinCancel" type="button" onclick="closeWindow()">Cancel</button>
+<input class="pinSubmit" type="submit" value="Pin" onclick="closeWindow()">
+</form>
+</div>
+
+<iframe id="hidden-iframe" style="display:none"></iframe>
+</body>
+</html>
+
+
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<head>
+<title>Pennterest Login</title>
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+<link rel='stylesheet' href='/stylesheets/login.css' />
+</head>
+<body>
+	<div id="toolbar">
+		Pennterest
+	</div>
+
+	<div id="login-container">
+	    <form method="post" id="login-form" class="well span4">
+	      <h1>Welcome!</h1>
+	      <p class="subheading">Please Login To Your Account</p>
+	      <% if (!(typeof errmsg === 'undefined')) { %><label class="error"><%= errmsg %></label><%}%>
+	      <label>Email </label>
+	      <input type="text" name="email" id="email-tf" class="span4 required">
+	      <label>Password</label>
+	      <input type="password" name="pass" id="pass-tf" class="span4 required">
+	      <button type="submit" id="btn-login" class="btn btn-primary">Sign in</button>
+	      <div class="clear-fix"></div>
+	      <hr>
+	      <div class="btm-links"><a href="#" id="create-account">Create An Account</a></div>
+	    </form>
+  	</div>
+  	<div id="register-container" style="display:none">
+	    <form action="/register" method="post" id="register-form" class="well span4">
+	      <h1>Welcome!</h1>
+	      <p class="subheading">Sign Up For A New Account</p>
+	      <label>First Name </label>
+	      <input type="text" name="fname" id="fname-tf" class="span4 required">
+	      <label>Email </label>
+	      <input type="text" name="email" id="email-tf" class="span4 required">
+	      <label>Password</label>
+	      <input type="password" name="pass" id="pass-tf" class="span4 required">
+	      <button type="submit" id="btn-login" class="btn btn-primary">Register</button>
+	      <div class="clear-fix"></div>
+	      <hr>
+	      <div class="btm-links"><a href="#" id="login">Login</a></div>
+	    </form>
+  	</div>
+</body>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+<script type='text/javascript' src='/js/jquery.validate.js'></script>
+<script src="/js/bootstrap-modal.js"></script>
+<script src="/js/bootstrap-transition.js"></script>
+<script>
+	$().ready(function() {
+		$("#login-form").validate({
+			rules: {
+				email: {
+					required: true,
+					email: true
+				},
+				pass: {
+					required: true
+				}
+			}
+		});
+		$("#register-form").validate({
+			rules: {
+				email: {
+					required: true,
+					email: true
+				},
+				pass: {
+					required: true
+				},
+				fname: {
+					required: true
+				}
+			}
+		});
+		$("#create-account").click(function(){ $("#login-container").hide(); $("#register-container").show(); });
+		
+		$("#login").click(function(){ $("#register-container").hide(); $("#login-container").show(); });
+	});
+</script>
+</html>
+
+

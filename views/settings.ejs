@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<head>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+</head>
+
+<body>
+<div id="toolbar">
+Pennterest
+<span><form id="search" action="/search" method="get">
+	<input type="text" name="userID" value="<%=user[0].USERID%>" style="display:none">
+	<input id="textInput" type="text" size="21" maxlength="120" name="searchterm">
+	<input id="searchButton" type="submit" value="search" class="tfbutton">
+</form></span>
+<span id="logout"><a href="/logout">Logout</a></span>
+<span id="home"><a href="/home?userID=<%=user[0].USERID%>">Home</a></span>
+<span id="profile"><a href="/user">Profile</a></span>
+<span id="settings"><a href="/settings?userID=<%=user[0].USERID%>">Settings</a></span>
+</div>
+
+<div id="formBox">
+<form id="settingsForm" method="POST" action="/changeSettings">
+<% 
+var firstName = user[0].FIRSTNAME;
+var lastName = user[0].LASTNAME;
+if(lastName == null || lastName == 'undefined') { lastName = ""; }
+var dob = user[0].DOB;
+if(dob == null || dob == 'undefined') { dob = ""; }
+var email = user[0].EMAIL;
+var gender = user[0].GENDER;
+if(gender == null || gender == 'undefined') {gender = 'F'; }
+var affiliation = user[0].AFFILIATION;
+if(affiliation == null || affiliation == 'undefined') { affiliation = ""; }
+var interests = user[0].INTERESTS;
+if(interests == null || interests == 'undefined') {interests = "";}
+var bio = user[0].BIO;
+if(bio == null || bio == 'undefined') { bio = ""; }
+var profilepic = user[0].PROFILEPICPATH;
+if(profilepic == null || profilepic == 'undefined') {profilepic = "";}
+%>
+<table>
+<tr>
+<td>First Name </td>
+<td><input name="firstName" type="text" value="<%=firstName%>"></td>
+</tr>
+<tr>
+<td>Last Name </td>
+<td><input name="lastName" type="text" value="<%=lastName%>"></td>
+</tr>
+<tr>
+<td>DOB</td>
+<td><input name="dob" type="text" value="<%=dob%>"> 
+<span style="color:#888888;font-size:16px">(MM/DD/YYYY)<span></td>
+</tr>
+<% 
+var isMale = false;
+var isFemale = false;   
+if (gender == 'M'){
+isMale = true;
+}
+else if (gender == 'F'){
+isFemale = true;
+}
+%>
+<tr>
+<td>Gender</td>
+<td>M<input type="radio" name="gender" value="M" checked="<%=isMale%>"> 
+F<input type="radio" name="gender" value="F" checked="<%=isFemale%>"></td>
+</tr>
+<tr>
+<td>Email</td>
+<td><input name="email" type="text" value="<%=email%>"><td>
+</tr>
+<tr>
+<td>Affiliation</td>
+<td> <input name="affiliation" type="text" value="<%=affiliation%>"> </td>
+</tr>
+<tr>
+<td>
+Interests
+</td>
+<td>
+<textarea name="interests" style="width:300px;height:150px"><%=interests%></textarea>
+</td>
+</tr>
+<tr>
+<td>About Me</td>
+<td><textarea name="bio" style="width:300px;height:150px"><%=bio%></textarea></td>
+</tr>
+<tr>
+<td>Profile Picture URL</td>
+<td><input name="profilepic" type="text" value="<%=profilepic%>"></td>
+</tr>
+</table>
+<div style="text-align:center"><input type="submit" value="Apply Changes")"></div>
+</form>
+</div>
+<iframe id="hidden-iframe" style="display:none"></iframe>
+</body>
+</html>

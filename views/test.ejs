@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %> Request Info</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %> Request Info</h1>
+    <p>This page was made to get a better sense of what we can see in a request object that gets passed to our templating engine. Try out a URL like 127.0.0.1:3000/test?blue=3&stuff=pants to see what happens!</p>
+    <p>Note: you can modify ejs files and simply refresh the page to see the updates. When modifying server-side js files, you need to restart the server.</p>
+    <br />
+    <%
+    // this code to print out everything about an object was shamelessly stolen from stackoverflow
+    for (var key in request) {
+   		if (request.hasOwnProperty(key)) {
+      		var obj = request[key];
+      		for (var prop in obj) {
+         		if (obj.hasOwnProperty(prop)) {%>
+            		<%=prop + " = " + obj[prop]%><br />
+         		<%}
+      		}
+   		}
+	}
+    %>
+  </body>
+</html>
